@@ -1,8 +1,7 @@
 import express from 'express'
+import cpuDataController from '../controllers/cpu-data.controller.js'
 const router = express.Router()
 
-router.get('/', async (req, res, next) => {
-  res.send({ message: 'Ok api is working 🚀' })
-})
+router.get('/usage', cpuDataController.getCpuUsage)
 
 export default router
