@@ -5,7 +5,12 @@ import os from 'os-utils'
  * @returns {number} Returns the CPU usage as a percentage.
  */
 async function getCpuUsage () {
-  const cpuUsage = Math.round(100 * await new Promise(resolve => os.cpuUsage(resolve)))
+  const usageValue = Math.round(
+    100 * (await new Promise((resolve) => os.cpuUsage(resolve)))
+  )
+  const cpuUsage = {
+    value: usageValue
+  }
   return cpuUsage
 }
 
