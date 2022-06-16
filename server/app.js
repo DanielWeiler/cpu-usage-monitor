@@ -28,5 +28,15 @@ io.on('connection', (socket) => {
   })
 })
 
+io.use((socket, next) => {
+  if (socket.conn) {
+    next()
+  } else {
+    const err = new Error('A server error occured.')
+    err.data = { content: 'Please retry later.' }
+    next(err)
+  }
+})
+
 const PORT = process.env.PORT || 3000
 httpServer.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`))

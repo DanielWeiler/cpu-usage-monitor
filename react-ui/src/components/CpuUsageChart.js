@@ -9,8 +9,9 @@ const CpuUsageChart = () => {
   const [cpuUsageHistory, setCpuUsageHistory] = useState(Array(100).fill(0))
 
   useEffect(() => {
-    try {
-      socket.on('cpuUsage', (cpuUsage) => {
+    // Listens for CPU usage data from the server and stores it in state
+    socket.on('cpuUsage', (cpuUsage) => {
+      try {
         setCpuUsageHistory((currentState) => {
           const updatedState = currentState.concat(cpuUsage)
 
@@ -20,10 +21,17 @@ const CpuUsageChart = () => {
 
           return updatedState
         })
-      })
-    } catch (error) {
-      window.alert(`An error occurred while getting CPU usage data: ${error}`)
-    }
+      } catch (error) {
+        window.alert(`An error occurred while getting CPU usage data: ${error}`)
+      }
+    })
+
+    // Catches errors in connecting to the server
+    socket.on('connect_error', (err) => {
+      window.alert(
+        `Server connection error due to: ${err.message} ${err.data.content}`
+      )
+    })
   }, [])
 
   return (
