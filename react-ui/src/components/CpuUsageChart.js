@@ -1,25 +1,30 @@
 import { useEffect, useState } from 'react'
 import { Line, LineChart, XAxis, YAxis } from 'recharts'
-import cpuDataService from '../services/cpu-data.js'
+import io from 'socket.io-client'
+
+const socket = io('http://localhost:4000')
 
 const CpuUsageChart = () => {
-  const [cpuUsageHistory, setCpuUsageHistory] = useState([])
+  // The state array is declared with the amount of values to be recorded
+  const [cpuUsageHistory, setCpuUsageHistory] = useState(Array(100).fill(0))
 
   useEffect(() => {
-    async function fetchCpuData() {
-      try {
-        // Stores only the most recent 100 CPU usage values
-        if (cpuUsageHistory.length === 100) {
-          cpuUsageHistory.shift()
-        }
-        const usage = await cpuDataService.getCpuUsage('/usage')
-        setCpuUsageHistory(cpuUsageHistory.concat(usage))
-      } catch (error) {
-        window.alert(`An error occurred while getting CPU usage data: ${error}`)
-      }
+    try {
+      socket.on('cpuUsage', (cpuUsage) => {
+        setCpuUsageHistory((currentState) => {
+          const updatedState = currentState.concat(cpuUsage)
+
+          // Removes the least recent value so there is only a record of the
+          // latest 100 values
+          updatedState.shift()
+
+          return updatedState
+        })
+      })
+    } catch (error) {
+      window.alert(`An error occurred while getting CPU usage data: ${error}`)
     }
-    fetchCpuData()
-  }, [cpuUsageHistory])
+  }, [])
 
   return (
     <div>

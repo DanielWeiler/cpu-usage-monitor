@@ -1,25 +1,32 @@
 import 'dotenv/config'
-import express, { json, urlencoded } from 'express'
-import NotFound from 'http-errors'
-import cpuDataRouter from './routes/cpu-data.route.js'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import os from 'os-utils'
 
-const app = express()
-app.use(json())
-app.use(urlencoded({ extended: false }))
-
-app.use('/api/cpu-data', cpuDataRouter)
-
-app.use((req, res, next) => {
-  next(NotFound())
+const httpServer = createServer()
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:3000'
+  }
 })
 
-app.use((err, req, res, next) => {
-  res.status(err.status || 500)
-  res.send({
-    status: err.status || 500,
-    message: err.message
+io.on('connection', (socket) => {
+  const intervalID = setInterval(() => {
+    os.cpuUsage((usageValue) => {
+      const cpuUsage = Math.round(100 * usageValue)
+      socket.emit('cpuUsage', {
+        value: cpuUsage
+      })
+    })
+  }, 1000)
+
+  // Listens to when the client is closed and, when activated, disconnects the
+  // socket connection and stops the interval process of getting the CPU usage
+  socket.on('disconnect', function () {
+    socket.disconnect()
+    clearInterval(intervalID)
   })
 })
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`))
+httpServer.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`))
