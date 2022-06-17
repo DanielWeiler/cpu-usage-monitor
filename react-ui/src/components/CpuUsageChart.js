@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Line, LineChart, XAxis, YAxis } from 'recharts'
+import {
+  CartesianGrid,
+  Label,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts'
 import io from 'socket.io-client'
+import '../App.css'
 
 const socket = io('http://localhost:4000')
 
@@ -34,17 +44,32 @@ const CpuUsageChart = () => {
     })
   }, [])
 
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return <div>{<p>{`${payload[0].value}%`}</p>}</div>
+    }
+    return null
+  }
+
   return (
-    <div>
-      <h1>Real Time CPU Usage</h1>
-      <LineChart width={600} height={400} data={cpuUsageHistory}>
-        <XAxis dataKey="value" />
-        <YAxis
-          orientation="right"
-          ticks={[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
-        />
-        <Line type="monotone" dataKey="value" stroke="#8884d8" />
-      </LineChart>
+    <div className="chart-container">
+      <h2>Real Time CPU Usage</h2>
+      <ResponsiveContainer height="100%" width="100%">
+        <LineChart data={cpuUsageHistory}>
+          <XAxis tick={false}>
+            <Label value="100 seconds" position="insideBottomLeft" />
+          </XAxis>
+          <YAxis
+            orientation="right"
+            label={{ value: '%', offset: '0', position: 'insideTopRight' }}
+            ticks={[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
+          />
+          <Line type="monotone" dataKey="value" stroke="#8884d8" />
+          <Tooltip content={<CustomTooltip />} />
+          <CartesianGrid stroke="#bcd4e6" strokeDasharray="5 5" />
+        </LineChart>
+      </ResponsiveContainer>
+      <div style={{ fontSize: '0.9em' }}>(Hover over line to see values)</div>
     </div>
   )
 }
