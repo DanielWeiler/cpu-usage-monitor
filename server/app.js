@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import os from 'os-utils'
+import { getCpuUsage } from './utils.js'
 
 const httpServer = createServer()
 const io = new Server(httpServer, {
@@ -11,12 +11,10 @@ const io = new Server(httpServer, {
 })
 
 io.on('connection', (socket) => {
-  const intervalID = setInterval(() => {
-    os.cpuUsage((usageValue) => {
-      const cpuUsage = Math.round(100 * usageValue)
-      socket.emit('cpuUsage', {
-        value: cpuUsage
-      })
+  const intervalID = setInterval(async () => {
+    const cpuUsage = await getCpuUsage()
+    socket.emit('cpuUsage', {
+      value: cpuUsage
     })
   }, 1000)
 
