@@ -3,7 +3,8 @@
 A single-page application that monitors the CPU usage of the host device. It was built to monitor a personal computer running Windows. A line chart displays the CPU usage percentage for each second for the past 100 seconds. The chart updates in near real-time without a need for refreshing the browser. 
 
 
-https://user-images.githubusercontent.com/62244948/174366704-98807277-8b8b-41f6-97f5-c171c13d50b0.mp4
+
+https://user-images.githubusercontent.com/62244948/174372800-2d3c829f-ffc0-4ba1-ad3e-de9ec59cd49d.mp4
 
 
 
