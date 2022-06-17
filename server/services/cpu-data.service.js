@@ -5,12 +5,12 @@ import os from 'os'
  * @return {Promise<number>} Returns a promise of the percentage of the CPU
  * usage for the next second.
  */
-export function getCpuUsage () {
+async function getCpuUsage () {
   const stats1 = getCpuInfo()
   const startIdle = stats1.idle
   const startTotal = stats1.total
 
-  const promise = new Promise((resolve) => {
+  const usageValue = await new Promise((resolve) => {
     setTimeout(() => {
       const stats2 = getCpuInfo()
       const endIdle = stats2.idle
@@ -20,12 +20,16 @@ export function getCpuUsage () {
       const total = endTotal - startTotal
       const perc = idle / total
 
-      const cpuUsage = Math.round(100 * (1 - perc))
-      resolve(cpuUsage)
+      const promise = Math.round(100 * (1 - perc))
+      resolve(promise)
     }, 1000)
   })
 
-  return promise
+  const cpuUsage = {
+    value: usageValue
+  }
+
+  return cpuUsage
 }
 
 /**
@@ -60,3 +64,5 @@ function getCpuInfo () {
     total
   }
 }
+
+export default { getCpuUsage }

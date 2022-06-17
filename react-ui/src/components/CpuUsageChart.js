@@ -9,19 +9,19 @@ import {
   XAxis,
   YAxis
 } from 'recharts'
-import io from 'socket.io-client'
 import '../App.css'
-
-const socket = io('http://localhost:4000')
+import cpuDataService from '../services/cpu-data.js'
 
 const CpuUsageChart = () => {
   // The state array is declared with the amount of values to be recorded
   const [cpuUsageHistory, setCpuUsageHistory] = useState(Array(100).fill(0))
 
   useEffect(() => {
-    // Listens for CPU usage data from the server and stores it in state
-    socket.on('cpuUsage', (cpuUsage) => {
-      try {
+    try {
+      // Every second, gets the CPU usage data from the server and stores it in state 
+      setInterval(async () => {
+        const cpuUsage = await cpuDataService.getCpuUsage('/usage')
+
         setCpuUsageHistory((currentState) => {
           const updatedState = currentState.concat(cpuUsage)
 
@@ -31,17 +31,10 @@ const CpuUsageChart = () => {
 
           return updatedState
         })
-      } catch (error) {
-        window.alert(`An error occurred while getting CPU usage data: ${error}`)
-      }
-    })
-
-    // Catches errors in connecting to the server
-    socket.on('connect_error', (err) => {
-      window.alert(
-        `Server connection error due to: ${err.message} ${err.data.content}`
-      )
-    })
+      }, 1000)
+    } catch (error) {
+      window.alert(`An error occurred while getting CPU usage data: ${error}`)
+    }
   }, [])
 
   const CustomTooltip = ({ active, payload }) => {
