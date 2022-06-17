@@ -4,6 +4,7 @@ import NotFound from 'http-errors'
 import cpuDataRouter from './routes/cpu-data.route.js'
 
 const app = express()
+app.use(express.static('react-ui/build'))
 app.use(json())
 app.use(urlencoded({ extended: false }))
 

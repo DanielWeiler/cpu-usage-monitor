@@ -18,7 +18,7 @@ const CpuUsageChart = () => {
 
   useEffect(() => {
     try {
-      // Every second, gets the CPU usage data from the server and stores it in state 
+      // Every second, gets the CPU usage data from the server and stores it in state
       setInterval(async () => {
         const cpuUsage = await cpuDataService.getCpuUsage('/usage')
 
@@ -51,6 +51,7 @@ const CpuUsageChart = () => {
         <LineChart data={cpuUsageHistory}>
           <XAxis tick={false}>
             <Label value="100 seconds" position="insideBottomLeft" />
+            <Label value="Current" position="insideBottomRight" />
           </XAxis>
           <YAxis
             orientation="right"
